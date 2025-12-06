@@ -29,30 +29,14 @@
         position: absolute;
         top: 0; left: 0;
         display: block;
-      }
-
-      /* スマホ縦向きロック用オーバーレイ */
-      #rotate-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100vw;
-        height: 100vh;
         background: #000;
-        color: #fff;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: 22px;
-        padding: 20px;
-        z-index: 99999;
       }
     </style>
   </head>
 
   <body>
     <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width=1600 height=900 tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width="1600" height="900" tabindex="-1"></canvas>
 
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
@@ -69,10 +53,6 @@
       </div>
     </div>
 
-    <div id="rotate-overlay">
-      画面を横向きにしてください<br>(Rotate your device)
-    </div>
-
     <script>
       //--------------------------------------------------------------
       // Unity Loader セットアップ
@@ -83,7 +63,6 @@
       const progressBarFull = document.getElementById("unity-progress-bar-full");
       const fullscreenButton = document.getElementById("unity-fullscreen-button");
       const warningBanner = document.getElementById("unity-warning");
-      const overlay = document.getElementById("rotate-overlay");
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -117,114 +96,55 @@
       };
 
       //--------------------------------------------------------------
-      // デバイス判定
+      // 16:9 フィット（縦なら横基準、横なら縦基準）
+      //--------------------------------------------------------------
+      function fitCanvas16by9() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const targetRatio = 16 / 9;
+
+        let canvasWidth, canvasHeight;
+
+        if (w / h > targetRatio) {
+          // 画面が横に広い → 「縦基準で16:9」
+          canvasHeight = h;
+          canvasWidth  = h * targetRatio;
+        } else {
+          // 画面が縦に広い → 「横基準で16:9」
+          canvasWidth  = w;
+          canvasHeight = w / targetRatio;
+        }
+
+        // ピクセルサイズ
+        canvas.width  = canvasWidth;
+        canvas.height = canvasHeight;
+
+        // CSSサイズ
+        canvas.style.width  = canvasWidth + "px";
+        canvas.style.height = canvasHeight + "px";
+
+        // 画面中央に配置（上下左右の黒帯は自動でできる）
+        canvas.style.left = (w - canvasWidth) / 2 + "px";
+        canvas.style.top  = (h - canvasHeight) / 2 + "px";
+
+        // container は常に全画面
+        container.style.width  = w + "px";
+        container.style.height = h + "px";
+      }
+
+      window.addEventListener("resize", fitCanvas16by9);
+      window.addEventListener("orientationchange", fitCanvas16by9);
+      window.addEventListener("load", fitCanvas16by9);
+
+      //--------------------------------------------------------------
+      // Unity Loader 読み込み
       //--------------------------------------------------------------
       function isMobile(){
         return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       }
 
-      function isPortrait(){
-        return window.innerHeight > window.innerWidth;
-      }
-
-      //--------------------------------------------------------------
-      // ★ WebGL 黒画面バグ対策：強制再描画
-      //--------------------------------------------------------------
-      function forceWebGLRedraw() {
-        canvas.style.display = "none";
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            canvas.style.display = "block";
-          });
-        });
-      }
-
-      //--------------------------------------------------------------
-      // PC / スマホ横（変形なし）
-      //--------------------------------------------------------------
-      function fitDesktopLandscape() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
-        canvas.style.transform = "";
-        canvas.style.transformOrigin = "";
-
-        canvas.width = w;
-        canvas.height = h;
-
-        container.style.width = "100vw";
-        container.style.height = "100vh";
-        container.style.left = "0";
-        container.style.top = "0";
-      }
-
-      //--------------------------------------------------------------
-      // ★ スマホ横：rotate + 黒画面対策 + 拡大調整
-      //--------------------------------------------------------------
-      function fitMobileLandscape() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
-        const longSide  = Math.max(w, h);
-        const shortSide = Math.min(w, h);
-
-        const scale = 1.15;  // ← UI拡大倍率（調整できる）
-
-        canvas.style.transform = "";
-        canvas.style.transformOrigin = "";
-
-        canvas.width  = longSide * scale;
-        canvas.height = shortSide * scale;
-
-        canvas.style.transform = "rotate(90deg)";
-        canvas.style.transformOrigin = "center center";
-
-        canvas.style.width  = (longSide * scale) + "px";
-        canvas.style.height = (shortSide * scale) + "px";
-
-        canvas.style.left = (-(longSide * scale - longSide) / 2) + "px";
-        canvas.style.top  = (-(shortSide * scale - shortSide) / 2) + "px";
-
-        container.style.width  = shortSide + "px";
-        container.style.height = longSide + "px";
-
-        container.style.left = (w - shortSide) / 2 + "px";
-        container.style.top  = (h - longSide)  / 2 + "px";
-
-        // ★ 黒画面バグ完全防止
-        forceWebGLRedraw();
-      }
-
-      //--------------------------------------------------------------
-      // 表示切替
-      //--------------------------------------------------------------
-      function updateOrientation() {
-        if (!isMobile()) {
-          overlay.style.display = "none";
-          container.style.display = "block";
-          fitDesktopLandscape();
-          return;
-        }
-
-        if (isPortrait()) {
-          overlay.style.display = "flex";
-          container.style.display = "none";
-        } else {
-          overlay.style.display = "none";
-          container.style.display = "block";
-          fitMobileLandscape();
-        }
-      }
-
-      window.addEventListener("resize", updateOrientation);
-      window.addEventListener("orientationchange", updateOrientation);
-      window.addEventListener("load", updateOrientation);
-
-      //--------------------------------------------------------------
-      // Unity Loader 読み込み
-      //--------------------------------------------------------------
       if (isMobile()) {
-        var meta = document.createElement('meta');
+        const meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content =
           'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
@@ -243,10 +163,10 @@
           progressBarFull.style.width = (100 * progress) + "%";
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
-          fullscreenButton.onclick = () =>
-            unityInstance.SetFullscreen(1);
+          fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
 
-          updateOrientation();
+          // 起動後にもフィットを一発かけておく
+          fitCanvas16by9();
         }).catch((message) => {
           alert(message);
         });
