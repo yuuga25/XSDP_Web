@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | XrossStarsDataPortal</title>
+    <title>Unity WebGL Player | XSDP_Web</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
 
@@ -49,7 +49,7 @@
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">XrossStarsDataPortal</div>
+        <div id="unity-build-title">XSDP_Web</div>
       </div>
     </div>
 
@@ -57,12 +57,12 @@
       //--------------------------------------------------------------
       // Unity Loader セットアップ
       //--------------------------------------------------------------
-      const container = document.getElementById("unity-container");
-      const canvas = document.getElementById("unity-canvas");
-      const loadingBar = document.getElementById("unity-loading-bar");
+      const container       = document.getElementById("unity-container");
+      const canvas          = document.getElementById("unity-canvas");
+      const loadingBar      = document.getElementById("unity-loading-bar");
       const progressBarFull = document.getElementById("unity-progress-bar-full");
-      const fullscreenButton = document.getElementById("unity-fullscreen-button");
-      const warningBanner = document.getElementById("unity-warning");
+      const fullscreenButton= document.getElementById("unity-fullscreen-button");
+      const warningBanner   = document.getElementById("unity-warning");
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -82,21 +82,21 @@
         updateBannerVisibility();
       }
 
-      const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/XrossStarsDataPortal_WebGL.loader.js";
+      const buildUrl  = "Build";
+      const loaderUrl = buildUrl + "/XSDP_Web.loader.js";   // ← ここ修正
       const config = {
-        dataUrl: buildUrl + "/XrossStarsDataPortal_WebGL.data",
-        frameworkUrl: buildUrl + "/XrossStarsDataPortal_WebGL.framework.js",
-        codeUrl: buildUrl + "/XrossStarsDataPortal_WebGL.wasm",
+        dataUrl:          buildUrl + "/XSDP_Web.data",      // ← 修正
+        frameworkUrl:     buildUrl + "/XSDP_Web.framework.js", // ← 修正
+        codeUrl:          buildUrl + "/XSDP_Web.wasm",      // ← 修正
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "XrossStarsDataPortal",
-        productVersion: "1.0",
-        showBanner: unityShowBanner,
+        companyName:      "DefaultCompany",
+        productName:      "XSDP_Web",
+        productVersion:   "1.0",
+        showBanner:       unityShowBanner,
       };
 
       //--------------------------------------------------------------
-      // 16:9 フィット（縦なら横基準、横なら縦基準）
+      // 16:9 フィット（縦なら横基準・横なら縦基準）
       //--------------------------------------------------------------
       function fitCanvas16by9() {
         const w = window.innerWidth;
@@ -106,11 +106,11 @@
         let canvasWidth, canvasHeight;
 
         if (w / h > targetRatio) {
-          // 画面が横に広い → 「縦基準で16:9」
+          // 画面が横に広い → 高さ基準で16:9
           canvasHeight = h;
           canvasWidth  = h * targetRatio;
         } else {
-          // 画面が縦に広い → 「横基準で16:9」
+          // 画面が縦に広い → 幅基準で16:9
           canvasWidth  = w;
           canvasHeight = w / targetRatio;
         }
@@ -123,7 +123,7 @@
         canvas.style.width  = canvasWidth + "px";
         canvas.style.height = canvasHeight + "px";
 
-        // 画面中央に配置（上下左右の黒帯は自動でできる）
+        // 中央配置（余白＝黒帯）
         canvas.style.left = (w - canvasWidth) / 2 + "px";
         canvas.style.top  = (h - canvasHeight) / 2 + "px";
 
@@ -139,7 +139,7 @@
       //--------------------------------------------------------------
       // Unity Loader 読み込み
       //--------------------------------------------------------------
-      function isMobile(){
+      function isMobile() {
         return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       }
 
@@ -150,7 +150,7 @@
           'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.head.appendChild(meta);
         container.className = "unity-mobile";
-        canvas.className = "unity-mobile";
+        canvas.className    = "unity-mobile";
       }
 
       loadingBar.style.display = "block";
@@ -165,7 +165,7 @@
           loadingBar.style.display = "none";
           fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
 
-          // 起動後にもフィットを一発かけておく
+          // 起動後にも一発フィットしておく
           fitCanvas16by9();
         }).catch((message) => {
           alert(message);
