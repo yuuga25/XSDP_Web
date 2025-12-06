@@ -4,6 +4,13 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | XSDP_Web</title>
+
+    <!-- ★ ここをちょっと強化 -->
+    <meta name="viewport"
+          content="width=device-width, height=device-height,
+                  initial-scale=1.0, maximum-scale=1.0,
+                  user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
 
@@ -15,6 +22,9 @@
         height: 100%;
         overflow: hidden;
         background: #000;
+        /* ★ iOSの自動拡大抑制 */
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
       }
 
       #unity-container {
@@ -33,6 +43,7 @@
       }
     </style>
   </head>
+
 
   <body>
     <div id="unity-container" class="unity-desktop">
